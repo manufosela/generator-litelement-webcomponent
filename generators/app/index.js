@@ -92,7 +92,7 @@ module.exports = class extends Generator {
       this.destinationPath("rollup.config.js")
     );
     this.fs.copy(
-      this.templatePath(join(__dirname, "output", "babel.config.js")),
+      this.templatePath(join(__dirname, "template", "babel.config.js")),
       this.destinationPath("babel.config.js")
     );
   }
