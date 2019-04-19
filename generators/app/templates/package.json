@@ -1,0 +1,35 @@
+{
+  "name": "wc-name",
+  "description": "Lit-Element webcomponent wc name",
+  "version": "1.0.0",
+  "main": "wc-name.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user/wc-name"
+  },
+  "author": "user",
+  "license": "Apache 2.0",
+  "keywords": [
+    "webcomponent",
+    "lit-element"
+  ],
+  "bugs": {
+    "url": "https://github.com/user/wc-name/issues"
+  },
+  "homepage": "https://github.com/user/wc-name",
+  "dependencies": {
+    "lit-element": "^2.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-decorators": "^7.2.3",
+    "rollup": "^1.1.0",
+    "rollup-plugin-babel": "^4.3.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "@webcomponents/webcomponentsjs": "^2.2.4"
+  },
+  "scripts": {
+    "build": "rm -rf build && mkdir build && rollup -c"
+  }
+}
