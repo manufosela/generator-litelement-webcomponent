@@ -106,7 +106,7 @@ module.exports = class extends Generator {
       this.destinationPath("babel.config.js")
     );
     this.fs.copy(
-      this.templatePath(join(__dirname, "templates", ".gitignore")),
+      this.templatePath(join(__dirname, "templates", "gitignorefile")),
       this.destinationPath(".gitignore")
     );
   }
