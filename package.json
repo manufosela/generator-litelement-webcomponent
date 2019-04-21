@@ -1,12 +1,12 @@
 {
   "name": "generator-lit-element-base",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Generator to create LitElement WebComponent scafolding",
   "homepage": "https://github.com/manufosela/generator-litelement-webcomponent",
   "author": {
     "name": "manufosela",
     "email": "manufosela@gmail.com",
-    "url": "manufosela.es"
+    "url": "https://manufosela.es"
   },
   "files": [
     "generators"
