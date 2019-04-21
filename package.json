@@ -1,6 +1,6 @@
 {
   "name": "generator-lit-element-base",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Generator to create LitElement WebComponent scafolding",
   "homepage": "https://github.com/manufosela/generator-litelement-webcomponent",
   "author": {

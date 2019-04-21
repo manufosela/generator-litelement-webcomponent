@@ -3,12 +3,13 @@ const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 
+const whoami = __dirname.split("/").pop();
+
 module.exports = class extends Generator {
   prompting() {
-    // Have Yeoman greet the user.
     this.log(
       yosay(
-        `Welcome to the ${chalk.red("generator-lit-element-base")} generator!`
+        `Welcome to the ${chalk.red("lit-element-base")} generator (v1.2.2)!`
       )
     );
 
@@ -17,7 +18,7 @@ module.exports = class extends Generator {
         type: "input",
         name: "wcname",
         message: "Lit-Element webcomponent name (in kebab-case)",
-        default: "wc-name",
+        default: whoami,
         validate: input => {
           return Boolean(input.match(/-/));
         }
