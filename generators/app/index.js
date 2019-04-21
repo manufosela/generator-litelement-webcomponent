@@ -7,7 +7,7 @@ module.exports = class extends Generator {
   prompting() {
     this.log(
       yosay(
-        `Welcome to the ${chalk.red("lit-element-base")} generator (v1.2.2)!`
+        `Welcome to the ${chalk.red("lit-element-base")} generator (v1.3.2)!`
       )
     );
 
