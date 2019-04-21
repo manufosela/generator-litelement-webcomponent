@@ -1,6 +1,6 @@
 {
   "name": "wc-name",
-  "description": "Lit-Element webcomponent wc name",
+  "description": "Lit-Element webcomponent wc-name",
   "version": "1.0.0",
   "main": "wc-name.js",
   "repository": {
