@@ -48,7 +48,9 @@ module.exports = class extends Generator {
         "index.html",
         "demo/index.html",
         "package.json",
-        "rollup.config.js"
+        "rollup.config.js",
+        "LICENSE",
+        "README.md"
       ];
       const propCamelCase = this.props.wcname
         .split("-")
@@ -92,8 +94,20 @@ module.exports = class extends Generator {
       this.destinationPath("rollup.config.js")
     );
     this.fs.copy(
+      this.templatePath(join(__dirname, "output", "LICENSE")),
+      this.destinationPath("rollup.config.js")
+    );
+    this.fs.copy(
+      this.templatePath(join(__dirname, "output", "README.md")),
+      this.destinationPath("rollup.config.js")
+    );
+    this.fs.copy(
       this.templatePath(join(__dirname, "templates", "babel.config.js")),
       this.destinationPath("babel.config.js")
+    );
+    this.fs.copy(
+      this.templatePath(join(__dirname, "templates", ".gitignore")),
+      this.destinationPath(".gitignore")
     );
   }
 
