@@ -3,8 +3,6 @@ const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 
-const whoami = __dirname.split("/").pop();
-
 module.exports = class extends Generator {
   prompting() {
     this.log(
@@ -18,7 +16,7 @@ module.exports = class extends Generator {
         type: "input",
         name: "wcname",
         message: "Lit-Element webcomponent name (in kebab-case)",
-        default: whoami,
+        default: "wc-name",
         validate: input => {
           return Boolean(input.match(/-/));
         }
@@ -96,11 +94,11 @@ module.exports = class extends Generator {
     );
     this.fs.copy(
       this.templatePath(join(__dirname, "output", "LICENSE")),
-      this.destinationPath("rollup.config.js")
+      this.destinationPath("LICENSE")
     );
     this.fs.copy(
       this.templatePath(join(__dirname, "output", "README.md")),
-      this.destinationPath("rollup.config.js")
+      this.destinationPath("README.md")
     );
     this.fs.copy(
       this.templatePath(join(__dirname, "templates", "babel.config.js")),
