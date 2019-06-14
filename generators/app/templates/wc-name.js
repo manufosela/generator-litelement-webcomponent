@@ -10,8 +10,10 @@ import { LitElement, html, css } from 'lit-element';
  * @demo demo/index.html
  */
 
- class WcName extends LitElement {
-  static get is() { return 'wc-name'; }
+class WcName extends LitElement {
+  static get is() { 
+    return 'wc-name'; 
+  }
 
   static get properties() {
     return {
@@ -20,7 +22,7 @@ import { LitElement, html, css } from 'lit-element';
     };
   }
 
-  static get styles(){
+  static get styles() {
     return css`
       :host {
         display: block;
