@@ -4,7 +4,7 @@ import { LitElement, html, css } from 'lit-element';
  * `wc-name`
  * WcName
  *
- * @customElement
+ * @customElement wc-name
  * @polymer
  * @litElement
  * @demo demo/index.html
