@@ -89,8 +89,8 @@ module.exports = class extends Generator {
           join(__dirname, "templates", "package.json"),
           "utf8"
         );
-        let goodContent2 = goodContent2.replace(/user/gm, whoami);
-        goodContent2 = packageContent.replace(/wc-name/gm, this.props.wcname);
+        let goodContent2 = packageContent.replace(/user/gm, whoami);
+        goodContent2 = goodContent2.replace(/wc-name/gm, this.props.wcname);
         writeFileSync(join(__dirname, "output", "package.json"), goodContent2);
 
         /** FILE README.md */
