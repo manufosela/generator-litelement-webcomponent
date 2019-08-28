@@ -5,8 +5,14 @@ const yosay = require("yosay");
 const path = require("path");
 const process = require('child_process');
 
-const pwd = process.execSync("pwd").toString();
-const whoami = process.execSync("whoami").toString();
+const pwd = process
+  .execSync("pwd")
+  .toString()
+  .replace(/\n/, "");
+const whoami = process
+  .execSync("whoami")
+  .toString()
+  .replace(/\n/, "");
 const dirname = pwd.split("/").pop();
 const wcn = dirname.toLowerCase();
 
@@ -45,7 +51,7 @@ module.exports = class extends Generator {
     return this.prompt(prompts).then(props => {
       // To access props later use this.props.someAnswer;
       this.props = props;
-      this.props.wcname = this.props.wcname.toLowerCase().replace(/\n/, "");
+      this.props.wcname = this.props.wcname.toLowerCase();
       const { readFileSync, writeFileSync, mkdirSync } = require("fs");
       const { join } = require("path");
       try {
