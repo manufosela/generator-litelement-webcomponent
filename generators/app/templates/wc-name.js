@@ -11,8 +11,8 @@ import { LitElement, html, css } from 'lit-element';
  */
 
 class WcName extends LitElement {
-  static get is() { 
-    return 'wc-name'; 
+  static get is() {
+    return 'wc-name';
   }
 
   static get properties() {
@@ -29,7 +29,7 @@ class WcName extends LitElement {
       }
     `;
   }
-  
+
   constructor() {
     super();
     this.property1 = 'Year';
