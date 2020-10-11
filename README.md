@@ -15,6 +15,8 @@ npm install -g generator-lit-element-base
 Then generate your new project:
 
 ```bash
+mkdir lit-component
+cd lit-component
 yo lit-element-base
 ```
 
