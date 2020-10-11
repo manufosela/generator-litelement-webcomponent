@@ -3,7 +3,7 @@ const Generator = require("yeoman-generator");
 const chalk = require("chalk");
 const yosay = require("yosay");
 const path = require("path");
-const process = require('child_process');
+const process = require("child_process");
 
 const pwd = process
   .execSync("pwd")
@@ -22,7 +22,7 @@ module.exports = class extends Generator {
       yosay(
         `Welcome to the ${chalk.red("lit-element-base")} generator (v1.3.8)!`
       )
-    )
+    );
 
     const prompts = [
       {
@@ -72,6 +72,9 @@ module.exports = class extends Generator {
           "wc-name.js",
           "index.html",
           "demo/index.html",
+          "src/WcName.js",
+          "src/wc-name-styles.js",
+          "test/wc-name.test.js",
           "package.json",
           "rollup.config.js",
           "LICENSE",
@@ -102,10 +105,16 @@ module.exports = class extends Generator {
             join(__dirname, "templates", "package.json"),
             "utf8"
           );
-          let goodContent2 = packageContent.replace(/user/gm, this.props.author);
+          let goodContent2 = packageContent.replace(
+            /user/gm,
+            this.props.author
+          );
           goodContent2 = goodContent2.replace(/wc-name/gm, this.props.wcname);
           goodContent2 = goodContent2.replace(/LICENSE/gm, this.props.license);
-          writeFileSync(join(__dirname, "output", "package.json"), goodContent2);
+          writeFileSync(
+            join(__dirname, "output", "package.json"),
+            goodContent2
+          );
 
           /** FILE README.md */
           let readmeContent = readFileSync(
@@ -123,6 +132,12 @@ module.exports = class extends Generator {
   }
 
   writing() {
+    const propCamelCase = this.props.wcname
+      .split("-")
+      .map(part => {
+        return part.charAt(0).toUpperCase() + part.slice(1);
+      })
+      .join("");
     if (this.props.start) {
       const { join } = require("path");
       this.fs.copy(
@@ -140,6 +155,24 @@ module.exports = class extends Generator {
       this.fs.copy(
         this.templatePath(join(__dirname, "output", "demo/index.html")),
         this.destinationPath("demo/index.html")
+      );
+      this.fs.copy(
+        this.templatePath(
+          join(__dirname, "output", "src", this.props.wcname + "-styles.js")
+        ),
+        this.destinationPath("src/" + this.props.wcname + "-styles.js")
+      );
+      this.fs.copy(
+        this.templatePath(
+          join(__dirname, "output", "src", propCamelCase + ".js")
+        ),
+        this.destinationPath("src/" + propCamelCase + ".js")
+      );
+      this.fs.copy(
+        this.templatePath(
+          join(__dirname, "output", "test", this.props.wcname + ".test.js")
+        ),
+        this.destinationPath("test/" + this.props.wcname + ".test.js")
       );
       this.fs.copy(
         this.templatePath(join(__dirname, "output", "rollup.config.js")),
