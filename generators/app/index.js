@@ -67,13 +67,15 @@ module.exports = class extends Generator {
         } catch (e) {}
         mkdirSync(join(__dirname, "output"));
         mkdirSync(join(__dirname, "output", "demo"));
+        mkdirSync(join(__dirname, "output", "src"));
+        mkdirSync(join(__dirname, "output", "test"));
 
         const filenames = [
           "wc-name.js",
           "index.html",
           "demo/index.html",
           "src/WcName.js",
-          "src/wc-name-styles.js",
+          "src/wc-name-style.js",
           "test/wc-name.test.js",
           "package.json",
           "rollup.config.js",
@@ -95,6 +97,15 @@ module.exports = class extends Generator {
           goodContent = goodContent.replace(/WcName/gm, propCamelCase);
           if (filename === "wc-name.js") {
             filename = this.props.wcname + ".js";
+          }
+          if (filename === "src/WcName.js") {
+            filename = "src/" + propCamelCase + ".js";
+          }
+          if (filename === "src/wc-name-style.js") {
+            filename = "src/" + this.props.wcname + "-style.js";
+          }
+          if (filename === "test/wc-name.test.js") {
+            filename = "test/" + this.props.wcname + ".test.js";
           }
           goodContent = goodContent.replace(/WcName/gm, propCamelCase);
           goodContent = goodContent.replace(/user/gm, this.props.author);
@@ -158,9 +169,9 @@ module.exports = class extends Generator {
       );
       this.fs.copy(
         this.templatePath(
-          join(__dirname, "output", "src", this.props.wcname + "-styles.js")
+          join(__dirname, "output", "src", this.props.wcname + "-style.js")
         ),
-        this.destinationPath("src/" + this.props.wcname + "-styles.js")
+        this.destinationPath("src/" + this.props.wcname + "-style.js")
       );
       this.fs.copy(
         this.templatePath(

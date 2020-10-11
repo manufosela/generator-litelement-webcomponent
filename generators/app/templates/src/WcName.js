@@ -39,8 +39,8 @@ export class WcName extends LitElement {
   constructor() {
     super();
     this.property1 = "Year";
-    this.property2 = 2019;
-  
+    this.property2 = new Date().getFullYear();
+  }  
 
   render() {
     return html`
