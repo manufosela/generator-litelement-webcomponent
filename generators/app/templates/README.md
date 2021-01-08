@@ -24,20 +24,22 @@ Lit-Element web component description
 <wc-name></wc-name>
 
 ```
-## Install the Polymer-CLI
+## Install
 
-First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) and npm (packaged with [Node.js](https://nodejs.org)) installed. Run `npm install` to install your element's dependencies, then run `polymer serve` to serve your element locally.
+```
+git clone https://github.com/user/wc-name
+```
 
 ## Viewing Your Element
 
 ```
-$ polymer serve
+npm run start
 ```
 
 ## Running Tests
 
 ```
-$ polymer test
+npm run test
 ```
 
 ## Build
@@ -47,7 +49,7 @@ $ npm run build
 
 Your application is already set up to be tested via [web-component-tester](https://github.com/Polymer/web-component-tester). Run `polymer test` to run your application's test suite locally.
 
-##Author
+## Author
 **user**
 
 ## License

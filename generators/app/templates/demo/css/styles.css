@@ -1,0 +1,34 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+html{ line-height:1.15; -webkit-text-size-adjust:100%; }
+body{ margin:0; }
+main{ display:block; }
+h1{ font-size:2em; margin:.67em 0; }
+pre{ font-family:monospace,monospace; font-size:1em; }
+a{ background-color:transparent; }
+code{ font-family:monospace,monospace;font-size:1em; }
+button{ text-transform:none; -webkit-appearance:button; display:inline-block; line-height:normal; white-space:nowrap; vertical-align:middle; text-align:center; cursor:pointer; -webkit-user-drag:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;-webkit-box-sizing:border-box; box-sizing:border-box; font-family:inherit; font-size:100%; padding:.5em 1em; border:none transparent; border-radius:2px; color: white; border-radius: 4px; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); background:rgb(66, 184, 221);}
+button:focus, button:hover { color: rgb(66, 184, 221); background:rgba(66, 184, 221, 0.3); }
+button:focus{ outline:0 }
+button:active{ -webkit-box-shadow:0 0 0 1px rgba(0,0,0,.15) inset,0 0 6px rgba(0,0,0,.2) inset;box-shadow:0 0 0 1px rgba(0,0,0,.15) inset,0 0 6px rgba(0,0,0,.2) inset; border-color:#000; }
+
+header { grid-area: header; padding-bottom:2rem; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+aside { grid-area: sidebar }
+main { grid-area: main; display:grid; }
+footer { grid-area: footer; padding-top:2rem; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+fieldset { display: flex; justify-content: left; align-items: center; flex-direction: row; border:0; }
+fieldset button { margin:10px 40px; }
+animation-protonimg * { opacity: 0;}
+
+.container { width: 100vw; display: grid; grid-template-columns: 24vw 6vw 35vw 35vw; grid-template-rows: auto;
+  grid-template-areas: ". header header header" "sidebar . main main" "footer footer footer footer"; }
+.blocks { display:flex; flex-direction:row; flex-wrap: wrap; }
+.block { display:flex; flex-direction:column; flex-wrap: wrap; white-space: normal; }
+.code { padding: 20px; color:#FFF; background: #000; }
+.codestyle { font-size: 20px; line-height: 28px; background-color: darkblue; color: #ffffff; }
+.attributes { padding-left: 20px; }
+.wc { font-weight: bold; color:#0078e7; }
+.note { font-weight: bold; }

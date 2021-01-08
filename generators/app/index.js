@@ -58,6 +58,7 @@ module.exports = class extends Generator {
       // To access props later use this.props.someAnswer;
       this.props = props;
       if (this.props.start) {
+        this.props.year = new Date().getFullYear();
         this.props.wcname = this.props.wcname.toLowerCase();
         const { readFileSync, writeFileSync, mkdirSync } = require("fs");
         const { join } = require("path");
@@ -67,6 +68,7 @@ module.exports = class extends Generator {
         } catch (e) {}
         mkdirSync(join(__dirname, "output"));
         mkdirSync(join(__dirname, "output", "demo"));
+        mkdirSync(join(__dirname, "output", "demo", "css"));
         mkdirSync(join(__dirname, "output", "src"));
         mkdirSync(join(__dirname, "output", "test"));
 
@@ -74,6 +76,7 @@ module.exports = class extends Generator {
           "wc-name.js",
           "index.html",
           "demo/index.html",
+          join("demo", "css", "styles.css"),
           "src/WcName.js",
           "src/wc-name-style.js",
           "test/wc-name.test.js",
@@ -109,6 +112,7 @@ module.exports = class extends Generator {
           }
           goodContent = goodContent.replace(/WcName/gm, propCamelCase);
           goodContent = goodContent.replace(/user/gm, this.props.author);
+          goodContent = goodContent.replace(/U_S_E_R/gm, "user");
           writeFileSync(join(__dirname, "output", filename), goodContent);
 
           /** FILE package.json */
@@ -122,6 +126,7 @@ module.exports = class extends Generator {
           );
           goodContent2 = goodContent2.replace(/wc-name/gm, this.props.wcname);
           goodContent2 = goodContent2.replace(/LICENSE/gm, this.props.license);
+          goodContent2 = goodContent2.replace(/YEAR/gm, this.props.year);
           writeFileSync(
             join(__dirname, "output", "package.json"),
             goodContent2
@@ -136,6 +141,7 @@ module.exports = class extends Generator {
             /wc-name/gm,
             this.props.wcname
           );
+          goodContent3 = goodContent.replace(/user/gm, this.props.author);
           writeFileSync(join(__dirname, "output", "README.md"), goodContent3);
         });
       }
@@ -162,6 +168,10 @@ module.exports = class extends Generator {
       this.fs.copy(
         this.templatePath(join(__dirname, "output", "index.html")),
         this.destinationPath("index.html")
+      );
+      this.fs.copy(
+        this.templatePath(join(__dirname, "output", "demo/css/styles.css")),
+        this.destinationPath("demo/css/styles.css")
       );
       this.fs.copy(
         this.templatePath(join(__dirname, "output", "demo/index.html")),

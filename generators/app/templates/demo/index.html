@@ -3,36 +3,27 @@
   <head>
     <title>wc-name demo</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, U_S_E_R-scalable=yes">
     <script type="module" src="../wc-name.js"></script>
-    <style>
-      .blocks {
-        display:flex;
-        display-direction:row;
-        flex-wrap: wrap;
-      }
-      .block {
-        display:flex;
-        display-direction:column;
-        flex-wrap: wrap;
-        white-space: normal;
-      }
-      .code {
-        padding: 20px;
-        color:#FFF; 
-        background: #000;
-      }
-      .attributes {
-        padding-left: 20px;
-      }
-    </style>
+    <link rel="stylesheet" href="css/styles.css" />
   </head>
 
   <body>
-    <div class="vertical-section-container centered">
-      <h3>Basic wc-name Demo</h3>
-      <div class="blocks">
+    <div class="container">
+      <header>
+        <h1>Basic wc-name Demo</h1>
+        <nav>
+          <a href="https://github.com/manufosela/wc-name" title="github public repository">
+            <img src="https://img.shields.io/badge/github-repository-green" alt="github" />
+          </a>
+          <a href="https://www.npmjs.com/package/wc-name" title="npm package wc-name">
+            <img src="https://img.shields.io/badge/npmjs-package-red" alt="npm-package" />
+          </a>
+        </nav>
+      </header>
+      <aside class="blocks">
         <pre class="block code">
+          <h3>Example</h3>
           <code>
             &lt;wc-name&gt;&lt;/wc-name&gt;
           </code>
@@ -40,13 +31,51 @@
         <pre class="block attributes">
           <h3>Attributes</h3>
           <ul>
-            <li>property1 (String)</li>
-            <li>property2 (Number)</li>
+            <li>property1 (String [default Value])</li>
+            <li>property2 (Number) [default Value]</li>
           </ul>
+          <h3>Events</h3>
+          <ul>
+            <li>web-component_event-name-1</li>
+            <li>web-component_event-name-2</li>
+          </ul>
+          <p class="note">
+            NOTE: Events must send its node id into 
+            detail CustomEvent
+          </p>
         </pre>
-      </div>
+      </aside>
 
-      <wc-name></wc-name>
+      <main>
+        <div id="example1" class="block">
+          <fieldset>
+            <div>
+              <h3>Example 1</h3>
+              <!--<p>Click buttons to dispatch events to change image</p>-->
+            </div>
+            <!--
+            <button id="changeBtn1">event-name-1</button> 
+            <button id="changeBtn2">event-name-2</button>
+            -->
+          </fieldset>
+          <wc-name id="wc-name-1"></wc-name>
+        </div>
+        <div id="example2" class="block">
+          <fieldset>
+            <div>
+              <h3>Example 2</h3>
+              <!--<p>Click buttons to dispatch events to change image</p>-->
+            </div>
+            <!--
+            <button id="changeBtn1">event-name-1</button> 
+            <button id="changeBtn2">event-name-2</button>
+            -->
+          </fieldset>
+          <wc-name id="wc-name-2"></wc-name>
+        </div>
+      </main>
+      
+      <footer>developed by <b>user</b></footer>
     </div>
   </body>
 </html>
