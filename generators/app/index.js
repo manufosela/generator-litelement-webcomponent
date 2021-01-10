@@ -82,6 +82,7 @@ module.exports = class extends Generator {
           "test/wc-name.test.js",
           "package.json",
           "rollup.config.js",
+          "postcss.config.js",
           "LICENSE",
           "README.md"
         ];
