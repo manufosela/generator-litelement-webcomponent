@@ -201,6 +201,10 @@ module.exports = class extends Generator {
         this.destinationPath("rollup.config.js")
       );
       this.fs.copy(
+        this.templatePath(join(__dirname, "output", "postcss.config.js")),
+        this.destinationPath("postcss.config.js")
+      );
+      this.fs.copy(
         this.templatePath(join(__dirname, "output", "LICENSE")),
         this.destinationPath("LICENSE")
       );
