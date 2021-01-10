@@ -1,6 +1,6 @@
 # Yeoman Generator to create Lit-Element WebComponent
 
-# generator-lit-element-base [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
+# generator-lit-element-base [![NPM version][npm-image]][npm-url]
 > Generator to create LitElement WebComponent scafolding
 
 ## Installation
