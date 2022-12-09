@@ -29,13 +29,13 @@
     "lint-staged": "^10.5.3",
     "prettier": "^2.2.1",
     "yeoman-assert": "^3.1.1",
-    "yeoman-test": "^4.0.0"
+    "yeoman-test": "^7.0.0"
   },
   "engines": {
     "npm": ">= 4.0.0"
   },
   "dependencies": {
-    "yeoman-generator": "^2.0.1",
+    "yeoman-generator": "^5.7.0",
     "chalk": "^2.1.0",
     "yosay": "^2.0.1"
   },
