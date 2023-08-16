@@ -1,17 +1,18 @@
 {
   "name": "generator-lit-element-base",
-  "version": "1.5.4",
-  "description": "Generator to create LitElement WebComponent scafolding",
+  "version": "1.5.5",
+  "description": "Generator to create a improvment LitElement WebComponent from @open-wc",
   "homepage": "https://github.com/manufosela/generator-litelement-webcomponent",
   "author": {
     "name": "manufosela",
     "email": "manufosela@gmail.com",
     "url": "https://manufosela.es"
   },
+  "type": "module",
   "files": [
     "generators"
   ],
-  "main": "generators/index.js",
+  "main": "generators/app/index.js",
   "keywords": [
     "lit-element",
     "webcomponents",
@@ -19,25 +20,25 @@
     "yeoman-generator"
   ],
   "devDependencies": {
-    "coveralls": "^3.1.0",
-    "eslint": "^7.17.0",
-    "eslint-config-prettier": "^7.1.0",
-    "eslint-config-xo": "^0.34.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "husky": "^4.3.7",
-    "jest": "^26.6.3",
-    "lint-staged": "^10.5.3",
-    "prettier": "^2.2.1",
+    "coveralls": "^3.1.1",
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-xo": "^0.43.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
+    "jest": "^29.6.2",
+    "lint-staged": "^14.0.0",
+    "prettier": "^3.0.2",
     "yeoman-assert": "^3.1.1",
-    "yeoman-test": "^4.0.0"
+    "yeoman-test": "^7.4.0"
   },
   "engines": {
     "npm": ">= 4.0.0"
   },
   "dependencies": {
-    "yeoman-generator": "^2.0.1",
-    "chalk": "^2.1.0",
-    "yosay": "^2.0.1"
+    "yeoman-generator": "^5.9.0",
+    "chalk": "^5.3.0",
+    "yosay": "^2.0.2"
   },
   "jest": {
     "testEnvironment": "node"

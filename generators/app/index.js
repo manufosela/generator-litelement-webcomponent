@@ -1,22 +1,18 @@
 "use strict";
-const Generator = require("yeoman-generator");
-const chalk = require("chalk");
-const yosay = require("yosay");
-const path = require("path");
-const process = require("child_process");
 
-const pwd = process
-  .execSync("pwd")
-  .toString()
-  .replace(/\n/, "");
-const whoami = process
-  .execSync("whoami")
-  .toString()
-  .replace(/\n/, "");
+import chalk from "chalk";
+
+import Generator from "yeoman-generator";
+import yosay from "yosay";
+import path from "path";
+import process from "child_process";
+
+const pwd = process.execSync("pwd").toString().replace(/\n/, "");
+const whoami = process.execSync("whoami").toString().replace(/\n/, "");
 const dirname = pwd.split("/").pop();
 const wcn = dirname.toLowerCase();
 
-module.exports = class extends Generator {
+export default class extends Generator {
   prompting() {
     this.log(
       yosay(
@@ -30,31 +26,31 @@ module.exports = class extends Generator {
         name: "wcname",
         message: "Lit-Element webcomponent name (in kebab-case)",
         default: wcn,
-        validate: input => {
+        validate: (input) => {
           return Boolean(input.match(/-/));
-        }
+        },
       },
       {
         type: "input",
         name: "author",
-        message: "Author of web component?",
-        default: whoami
+        message: "Github user or author's name",
+        default: whoami,
       },
       {
         type: "input",
         name: "license",
-        message: "LICENSE",
-        default: "Apache-2.0"
+        message: "LICENSE (MIT, Apache-2.0, ISC, GPL-3.0)",
+        default: "Apache-2.0",
       },
       {
         type: "confirm",
         name: "start",
         message: "Would you like to create a lit-element webcomponent?",
-        default: false
-      }
+        default: false,
+      },
     ];
 
-    return this.prompt(prompts).then(props => {
+    return this.prompt(prompts).then((props) => {
       // To access props later use this.props.someAnswer;
       this.props = props;
       if (this.props.start) {
@@ -63,9 +59,12 @@ module.exports = class extends Generator {
         const { readFileSync, writeFileSync, mkdirSync } = require("fs");
         const { join } = require("path");
         try {
-          const { execSync } = require("child_process");
+          const {} = require("child_process");
           execSync("rm -rf " + path.join(__dirname, "output"));
-        } catch (e) {}
+        } catch (e) {
+          process.exit(e.code);
+        }
+
         mkdirSync(join(__dirname, "output"));
         mkdirSync(join(__dirname, "output", "demo"));
         mkdirSync(join(__dirname, "output", "demo", "css"));
@@ -84,15 +83,15 @@ module.exports = class extends Generator {
           "rollup.config.js",
           "postcss.config.js",
           "LICENSE",
-          "README.md"
+          "README.md",
         ];
         const propCamelCase = this.props.wcname
           .split("-")
-          .map(part => {
+          .map((part) => {
             return part.charAt(0).toUpperCase() + part.slice(1);
           })
           .join("");
-        filenames.forEach(filename => {
+        filenames.forEach((filename) => {
           let content = readFileSync(
             join(__dirname, "templates", filename),
             "utf8"
@@ -102,15 +101,19 @@ module.exports = class extends Generator {
           if (filename === "wc-name.js") {
             filename = this.props.wcname + ".js";
           }
+
           if (filename === "src/WcName.js") {
             filename = "src/" + propCamelCase + ".js";
           }
+
           if (filename === "src/wc-name-style.js") {
             filename = "src/" + this.props.wcname + "-style.js";
           }
+
           if (filename === "test/wc-name.test.js") {
             filename = "test/" + this.props.wcname + ".test.js";
           }
+
           goodContent = goodContent.replace(/WcName/gm, propCamelCase);
           goodContent = goodContent.replace(/user/gm, this.props.author);
           goodContent = goodContent.replace(/U_S_E_R/gm, "user");
@@ -152,7 +155,7 @@ module.exports = class extends Generator {
   writing() {
     const propCamelCase = this.props.wcname
       .split("-")
-      .map(part => {
+      .map((part) => {
         return part.charAt(0).toUpperCase() + part.slice(1);
       })
       .join("");
@@ -232,4 +235,4 @@ module.exports = class extends Generator {
       this.npmInstall();
     }
   }
-};
+}
