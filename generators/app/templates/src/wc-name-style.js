@@ -1,12 +1,8 @@
-import { css } from 'lit-element';
+import { css } from 'lit';
 
 export const wcNameStyles = css`
   :host {
     display: block;
     --default-main-color: #ff7900;
-  }
-  .wc-name {
-    background-color: inherit;
-    color: var(--main-color, var(--default-main-color));
   }
 `;
