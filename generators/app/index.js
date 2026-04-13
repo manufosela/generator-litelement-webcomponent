@@ -5,11 +5,16 @@ import chalk from "chalk";
 import Generator from "yeoman-generator";
 import yosay from "yosay";
 import path from "node:path";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { readFileSync, writeFileSync } from "node:fs";
 
-import { getWCClassName, replacePackageVersion } from "./helpers.js";
+import {
+  SUPPORTED_LICENSES,
+  assertSupportedLicense,
+  getWCClassName,
+  replacePackageVersion,
+} from "./helpers.js";
 
 const whoami = execSync("whoami").toString().replace(/\n/, "");
 const __filename = fileURLToPath(import.meta.url);
@@ -109,12 +114,10 @@ export default class extends Generator {
   }
 
   updateLicenseFile(directorioWC) {
+    const license = assertSupportedLicense(this.props.license);
+    const templateName = `LICENSE_${license.toUpperCase()}.md`;
     const licenseContent = readFileSync(
-      path.join(
-        __dirname,
-        "templates",
-        "LICENSE_" + this.props.license.toUpperCase() + ".md",
-      ),
+      path.join(__dirname, "templates", templateName),
       "utf8",
     );
     writeFileSync(path.join(directorioWC, "LICENSE"), licenseContent);
@@ -123,9 +126,9 @@ export default class extends Generator {
   updateDependenciesVersions() {
     const fetchLatestVersion = (depName) => {
       console.log("check version for " + depName);
-      return execSync(`npm view ${depName} version`)
-        .toString()
-        .replace(/\n/, "");
+      return execFileSync("npm", ["view", depName, "version"], {
+        encoding: "utf8",
+      }).trim();
     };
 
     replacePackageVersion(this.packageJson.dependencies, fetchLatestVersion);
@@ -146,9 +149,10 @@ export default class extends Generator {
         default: whoami,
       },
       {
-        type: "input",
+        type: "list",
         name: "license",
-        message: "LICENSE (MIT, Apache-2.0, ISC, GPL-3.0)",
+        message: "LICENSE",
+        choices: SUPPORTED_LICENSES,
         default: "Apache-2.0",
       },
       {

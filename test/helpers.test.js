@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 
 import {
+  SUPPORTED_LICENSES,
+  assertSupportedLicense,
   getWCClassName,
   replacePackageVersion,
 } from "../generators/app/helpers.js";
@@ -87,5 +89,40 @@ describe("replacePackageVersion", () => {
         throw boom;
       }),
     ).toThrow(boom);
+  });
+});
+
+describe("assertSupportedLicense", () => {
+  it("exposes the frozen allow-list", () => {
+    expect(SUPPORTED_LICENSES).toEqual(["MIT", "Apache-2.0", "ISC", "GPL-3.0"]);
+    expect(Object.isFrozen(SUPPORTED_LICENSES)).toBe(true);
+  });
+
+  it.each(SUPPORTED_LICENSES)("accepts the supported license %s", (license) => {
+    expect(assertSupportedLicense(license)).toBe(license);
+  });
+
+  it("rejects unknown licenses", () => {
+    expect(() => assertSupportedLicense("BSD")).toThrow(/Unsupported license/);
+  });
+
+  it("rejects path traversal attempts", () => {
+    expect(() => assertSupportedLicense("../../etc/passwd")).toThrow(
+      /Unsupported license/,
+    );
+  });
+
+  it("is case sensitive against the SPDX canonical form", () => {
+    expect(() => assertSupportedLicense("mit")).toThrow(/Unsupported license/);
+    expect(() => assertSupportedLicense("APACHE-2.0")).toThrow(
+      /Unsupported license/,
+    );
+  });
+
+  it("rejects non-string input", () => {
+    expect(() => assertSupportedLicense(undefined)).toThrow(
+      /Unsupported license/,
+    );
+    expect(() => assertSupportedLicense(null)).toThrow(/Unsupported license/);
   });
 });
