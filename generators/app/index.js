@@ -4,13 +4,12 @@ import chalk from "chalk";
 
 import Generator from "yeoman-generator";
 import yosay from "yosay";
-import path from "path";
-import process from "child_process";
-import nodeprocess from "node:process";
-import { fileURLToPath } from "url";
-import { readFileSync, writeFileSync } from "fs";
+import path from "node:path";
+import { execSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { readFileSync, writeFileSync } from "node:fs";
 
-const whoami = process.execSync("whoami").toString().replace(/\n/, "");
+const whoami = execSync("whoami").toString().replace(/\n/, "");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -18,7 +17,7 @@ export default class extends Generator {
   /** * AUXILIARY METHODS */
   installWC() {
     try {
-      process.execSync("npm init @open-wc", { stdio: "inherit" });
+      execSync("npm init @open-wc", { stdio: "inherit" });
       console.log("npm init @open-wc ejecutado correctamente.");
     } catch (error) {
       console.error("Error al ejecutar npm init @open-wc:", error.message);
@@ -26,12 +25,9 @@ export default class extends Generator {
   }
 
   putIntoWCDirectory() {
-    const dir = process
-      .execSync("ls -t | head -n1")
-      .toString()
-      .replace(/\n/, "");
+    const dir = execSync("ls -t | head -n1").toString().replace(/\n/, "");
     console.log("\nDirectorio creado: " + dir);
-    nodeprocess.chdir(dir);
+    process.chdir(dir);
   }
 
   getWCName() {
@@ -79,7 +75,7 @@ export default class extends Generator {
 
   installNewPackageJson() {
     try {
-      process.execSync("npm install", { stdio: "inherit" });
+      execSync("npm install", { stdio: "inherit" });
       console.log("Dependencias actualizadas correctamente.");
     } catch (error) {
       console.error("Error al actualizar las dependencias:", error.message);
@@ -88,7 +84,7 @@ export default class extends Generator {
 
   fixPackageJsonVulnerabilities() {
     try {
-      process.execSync("npm audit fix", { stdio: "inherit" });
+      execSync("npm audit fix", { stdio: "inherit" });
       console.log("Vulnerabilidades arregladas correctamente.");
     } catch (error) {
       console.error("Error al arreglar las vulnerabilidades:", error.message);
@@ -178,18 +174,16 @@ export default class extends Generator {
 
   updateDependenciesVersions() {
     const jsonPackageParsed = JSON.parse(this.packageJsonContent);
-    let jsonStringNew = this.replacePackageVersion(
+    this.packageJsonContent = this.replacePackageVersion(
       this.packageJsonContent,
       jsonPackageParsed,
       "dependencies"
     );
-    jsonStringNew = this.replacePackageVersion(
+    this.packageJsonContent = this.replacePackageVersion(
       this.packageJsonContent,
       jsonPackageParsed,
       "devDependencies"
     );
-
-    return jsonStringNew;
   }
 
   /** * MAIN METHODS */
@@ -270,7 +264,7 @@ export default class extends Generator {
 
         /* Obtener directorio de trabajo del script */
         console.log("12.- Get working directory");
-        const directorioWC = nodeprocess.cwd();
+        const directorioWC = process.cwd();
 
         /* Generar fichero src/wc-name-style.js */
         console.log("13.- Generate WCStyleFile from template");
@@ -287,7 +281,7 @@ export default class extends Generator {
         this.log(
           "\n\n* * *   STOPED Generator Lit Element Base by User   * * *\n"
         );
-        nodeprocess.exit(0);
+        process.exit(0);
       }
     });
   }
