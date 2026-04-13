@@ -31,46 +31,22 @@ export default class extends Generator {
   }
 
   getWCName() {
-    const jsonPackage = JSON.parse(this.packageJsonContent);
-    console.log("Nombre del webcomponent: " + jsonPackage.name);
-    return jsonPackage.name;
+    console.log("Nombre del webcomponent: " + this.packageJson.name);
+    return this.packageJson.name;
   }
 
   updatePackageJsonInfo() {
-    const regExp = new RegExp('"author": "' + this.props.wcname + '"', "gm");
-    this.packageJsonContent = this.packageJsonContent.replace(
-      regExp,
-      '"author": "' + this.props.author + '"'
-    );
-    this.packageJsonContent = this.packageJsonContent.replace(
-      /"license": "MIT"/gm,
-      '"license": "' + this.props.license + '"'
-    );
-    this.packageJsonContent = this.packageJsonContent.replace(
-      /"version": "0.0.0"/gm,
-      '"version": "1.0.0"'
-    );
-    this.packageJsonContent = this.packageJsonContent.replace(
-      /"main": "index.js"/gm,
-      '"main": "' + this.props.wcname + '.js"'
-    );
+    this.packageJson.author = this.props.author;
+    this.packageJson.license = this.props.license;
+    this.packageJson.version = "1.0.0";
+    this.packageJson.main = `${this.props.wcname}.js`;
   }
 
   updateMoreInfoPackageJson() {
-    const home = `  "home": "https://github.com/${this.props.author}/${this.props.wcname}"`;
-    const repository = `  "repository": "git+https://github.com/${this.props.author}/${this.props.wcname}.git"`;
-    const bugs = `  "bugs": "https://github.com/${this.props.author}/${this.props.wcname}/issues"`;
-
-    this.packageJsonContent = this.packageJsonContent.replace(
-      '"customElements": "custom-elements.json",',
-      '"customElements": "custom-elements.json",\n' +
-        home +
-        ",\n" +
-        repository +
-        ",\n" +
-        bugs +
-        ","
-    );
+    const repoBase = `https://github.com/${this.props.author}/${this.props.wcname}`;
+    this.packageJson.home = repoBase;
+    this.packageJson.repository = `git+${repoBase}.git`;
+    this.packageJson.bugs = `${repoBase}/issues`;
   }
 
   installNewPackageJson() {
@@ -151,39 +127,25 @@ export default class extends Generator {
     writeFileSync(path.join(directorioWC, "LICENSE"), licenseContent);
   }
 
-  replacePackageVersion(jsonString, jsonPackage, deps) {
-    let jsonStringNew = jsonString;
-    const depsName = Object.keys(jsonPackage[deps]);
-    console.log(jsonPackage[deps]);
-    depsName.forEach((depName) => {
+  replacePackageVersion(deps) {
+    const depsMap = this.packageJson[deps];
+    if (!depsMap) {
+      return;
+    }
+    console.log(depsMap);
+    Object.keys(depsMap).forEach((depName) => {
       console.log("check version for " + depName);
       const npmCommand = `npm view ${depName} version`;
-      const packageVersion = process
-        .execSync(npmCommand)
-        .toString()
-        .replace(/\n/, "");
-      const searched =
-        '"' + depName + '": "' + jsonPackage[deps][depName] + '"';
-      const replacedby = '"' + depName + '": "^' + packageVersion + '"';
-      console.log("searched: " + searched);
-      console.log("replacedby: " + replacedby);
-      jsonStringNew = jsonStringNew.replace(searched, replacedby);
+      const packageVersion = execSync(npmCommand).toString().replace(/\n/, "");
+      const newValue = "^" + packageVersion;
+      console.log(`${depName}: ${depsMap[depName]} -> ${newValue}`);
+      depsMap[depName] = newValue;
     });
-    return jsonStringNew;
   }
 
   updateDependenciesVersions() {
-    const jsonPackageParsed = JSON.parse(this.packageJsonContent);
-    this.packageJsonContent = this.replacePackageVersion(
-      this.packageJsonContent,
-      jsonPackageParsed,
-      "dependencies"
-    );
-    this.packageJsonContent = this.replacePackageVersion(
-      this.packageJsonContent,
-      jsonPackageParsed,
-      "devDependencies"
-    );
+    this.replacePackageVersion("dependencies");
+    this.replacePackageVersion("devDependencies");
   }
 
   /** * MAIN METHODS */
@@ -228,7 +190,9 @@ export default class extends Generator {
 
         /* Leer el fichero package.json */
         console.log("3.- Read package.json");
-        this.packageJsonContent = readFileSync("package.json", "utf8");
+        this.packageJson = JSON.parse(
+          readFileSync("package.json", "utf8")
+        );
 
         /* Leer el fichero package.json y extraer el nombre del webcomponent de la propiedad name */
         console.log("4.- Get WC name from package.json");
@@ -248,7 +212,11 @@ export default class extends Generator {
 
         /* Escribir el neuvo fichero package.json */
         console.log("8.- Write new package.json");
-        writeFileSync("package.json", this.packageJsonContent, "utf8");
+        writeFileSync(
+          "package.json",
+          JSON.stringify(this.packageJson, null, 2) + "\n",
+          "utf8"
+        );
 
         /* Arreglar posibles vulnerabilidades del package.json */
         console.log("9.- Fix package.json vulnerabilities");
