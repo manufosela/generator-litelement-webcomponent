@@ -9,6 +9,8 @@ import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { readFileSync, writeFileSync } from "node:fs";
 
+import { getWCClassName, replacePackageVersion } from "./helpers.js";
+
 const whoami = execSync("whoami").toString().replace(/\n/, "");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -67,27 +69,18 @@ export default class extends Generator {
     }
   }
 
-  getWCClassName(wcname) {
-    return wcname
-      .split("-")
-      .map((part) => {
-        return part.charAt(0).toUpperCase() + part.slice(1);
-      })
-      .join("");
-  }
-
   generateWCStyleFile(directorioWC) {
-    const WCClassName = this.props.WCClassName;
+    const { WCClassName } = this.props;
     console.log(`Generando ${WCClassName}Style.js...`);
-    let content = readFileSync(
+    const content = readFileSync(
       path.join(__dirname, "templates", "src", "wc-name-style.js"),
-      "utf8"
+      "utf8",
     );
-    let WCStylesFilename = WCClassName + "Styles.js";
-    let goodContent = content.replace(/wcName/gm, WCClassName);
+    const WCStylesFilename = WCClassName + "Styles.js";
+    const goodContent = content.replace(/wcName/gm, WCClassName);
     writeFileSync(
       path.join(directorioWC, "src", WCStylesFilename),
-      goodContent
+      goodContent,
     );
   }
 
@@ -97,12 +90,12 @@ export default class extends Generator {
 
     let WCFileContent = readFileSync(
       path.join(directorioWC, "src", WCFilename),
-      "utf8"
+      "utf8",
     );
     const pattern = /static styles = css`[^`]*`;/g;
     WCFileContent = WCFileContent.replace(
       pattern,
-      "static styles = [" + this.props.WCClassName + "Styles];"
+      "static styles = [" + this.props.WCClassName + "Styles];",
     );
     WCFileContent = WCFileContent.replace(
       "import { html, css, LitElement } from 'lit';",
@@ -110,7 +103,7 @@ export default class extends Generator {
         this.props.WCClassName +
         "Styles } from './" +
         WCStylesFilename +
-        "';"
+        "';",
     );
     writeFileSync(path.join(directorioWC, "src", WCFilename), WCFileContent);
   }
@@ -120,38 +113,29 @@ export default class extends Generator {
       path.join(
         __dirname,
         "templates",
-        "LICENSE_" + this.props.license.toUpperCase() + ".md"
+        "LICENSE_" + this.props.license.toUpperCase() + ".md",
       ),
-      "utf8"
+      "utf8",
     );
     writeFileSync(path.join(directorioWC, "LICENSE"), licenseContent);
   }
 
-  replacePackageVersion(deps) {
-    const depsMap = this.packageJson[deps];
-    if (!depsMap) {
-      return;
-    }
-    console.log(depsMap);
-    Object.keys(depsMap).forEach((depName) => {
-      console.log("check version for " + depName);
-      const npmCommand = `npm view ${depName} version`;
-      const packageVersion = execSync(npmCommand).toString().replace(/\n/, "");
-      const newValue = "^" + packageVersion;
-      console.log(`${depName}: ${depsMap[depName]} -> ${newValue}`);
-      depsMap[depName] = newValue;
-    });
-  }
-
   updateDependenciesVersions() {
-    this.replacePackageVersion("dependencies");
-    this.replacePackageVersion("devDependencies");
+    const fetchLatestVersion = (depName) => {
+      console.log("check version for " + depName);
+      return execSync(`npm view ${depName} version`)
+        .toString()
+        .replace(/\n/, "");
+    };
+
+    replacePackageVersion(this.packageJson.dependencies, fetchLatestVersion);
+    replacePackageVersion(this.packageJson.devDependencies, fetchLatestVersion);
   }
 
   /** * MAIN METHODS */
   prompting() {
     this.log(
-      yosay(`Welcome to the ${chalk.red("Lit-base")} generator (v1.3.8)!`)
+      yosay(`Welcome to the ${chalk.red("Lit-base")} generator (v1.3.8)!`),
     );
 
     const prompts = [
@@ -190,9 +174,7 @@ export default class extends Generator {
 
         /* Leer el fichero package.json */
         console.log("3.- Read package.json");
-        this.packageJson = JSON.parse(
-          readFileSync("package.json", "utf8")
-        );
+        this.packageJson = JSON.parse(readFileSync("package.json", "utf8"));
 
         /* Leer el fichero package.json y extraer el nombre del webcomponent de la propiedad name */
         console.log("4.- Get WC name from package.json");
@@ -215,7 +197,7 @@ export default class extends Generator {
         writeFileSync(
           "package.json",
           JSON.stringify(this.packageJson, null, 2) + "\n",
-          "utf8"
+          "utf8",
         );
 
         /* Arreglar posibles vulnerabilidades del package.json */
@@ -228,7 +210,7 @@ export default class extends Generator {
 
         /* Generar nombre del webcomponent en camelCase */
         console.log("11.- Get WCClassName");
-        this.props.WCClassName = this.getWCClassName(this.props.wcname);
+        this.props.WCClassName = getWCClassName(this.props.wcname);
 
         /* Obtener directorio de trabajo del script */
         console.log("12.- Get working directory");
@@ -247,7 +229,7 @@ export default class extends Generator {
         this.updateLicenseFile(directorioWC);
       } else {
         this.log(
-          "\n\n* * *   STOPED Generator Lit Element Base by User   * * *\n"
+          "\n\n* * *   STOPED Generator Lit Element Base by User   * * *\n",
         );
         process.exit(0);
       }
