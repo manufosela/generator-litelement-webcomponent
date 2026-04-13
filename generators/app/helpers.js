@@ -52,3 +52,34 @@ export function replacePackageVersion(depsMap, fetchLatestVersion) {
 
   return depsMap;
 }
+
+/**
+ * SPDX identifiers for the licenses the generator can scaffold.
+ * Any other value is rejected by `assertSupportedLicense` to avoid path
+ * traversal when building the template filename from user input.
+ */
+export const SUPPORTED_LICENSES = Object.freeze([
+  "MIT",
+  "Apache-2.0",
+  "ISC",
+  "GPL-3.0",
+]);
+
+/**
+ * Assert that a user-provided license identifier belongs to the
+ * supported allow-list. Returns the original value on success and
+ * throws a descriptive error otherwise.
+ *
+ * @param {unknown} license The value provided by the user prompt.
+ * @returns {string} The same license string, guaranteed to be safe.
+ */
+export function assertSupportedLicense(license) {
+  if (!SUPPORTED_LICENSES.includes(license)) {
+    const allowed = SUPPORTED_LICENSES.join(", ");
+    throw new Error(
+      `Unsupported license "${license}". Allowed values: ${allowed}`,
+    );
+  }
+
+  return license;
+}
