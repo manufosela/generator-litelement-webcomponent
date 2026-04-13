@@ -6,30 +6,199 @@ import Generator from "yeoman-generator";
 import yosay from "yosay";
 import path from "path";
 import process from "child_process";
+import nodeprocess from "node:process";
+import { fileURLToPath } from "url";
+import { readFileSync, writeFileSync } from "fs";
 
-const pwd = process.execSync("pwd").toString().replace(/\n/, "");
 const whoami = process.execSync("whoami").toString().replace(/\n/, "");
-const dirname = pwd.split("/").pop();
-const wcn = dirname.toLowerCase();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default class extends Generator {
+  /** * AUXILIARY METHODS */
+  installWC() {
+    try {
+      process.execSync("npm init @open-wc", { stdio: "inherit" });
+      console.log("npm init @open-wc ejecutado correctamente.");
+    } catch (error) {
+      console.error("Error al ejecutar npm init @open-wc:", error.message);
+    }
+  }
+
+  putIntoWCDirectory() {
+    const dir = process
+      .execSync("ls -t | head -n1")
+      .toString()
+      .replace(/\n/, "");
+    console.log("\nDirectorio creado: " + dir);
+    nodeprocess.chdir(dir);
+  }
+
+  getWCName() {
+    const jsonPackage = JSON.parse(this.packageJsonContent);
+    console.log("Nombre del webcomponent: " + jsonPackage.name);
+    return jsonPackage.name;
+  }
+
+  updatePackageJsonInfo() {
+    const regExp = new RegExp('"author": "' + this.props.wcname + '"', "gm");
+    this.packageJsonContent = this.packageJsonContent.replace(
+      regExp,
+      '"author": "' + this.props.author + '"'
+    );
+    this.packageJsonContent = this.packageJsonContent.replace(
+      /"license": "MIT"/gm,
+      '"license": "' + this.props.license + '"'
+    );
+    this.packageJsonContent = this.packageJsonContent.replace(
+      /"version": "0.0.0"/gm,
+      '"version": "1.0.0"'
+    );
+    this.packageJsonContent = this.packageJsonContent.replace(
+      /"main": "index.js"/gm,
+      '"main": "' + this.props.wcname + '.js"'
+    );
+  }
+
+  updateMoreInfoPackageJson() {
+    const home = `  "home": "https://github.com/${this.props.author}/${this.props.wcname}"`;
+    const repository = `  "repository": "git+https://github.com/${this.props.author}/${this.props.wcname}.git"`;
+    const bugs = `  "bugs": "https://github.com/${this.props.author}/${this.props.wcname}/issues"`;
+
+    this.packageJsonContent = this.packageJsonContent.replace(
+      '"customElements": "custom-elements.json",',
+      '"customElements": "custom-elements.json",\n' +
+        home +
+        ",\n" +
+        repository +
+        ",\n" +
+        bugs +
+        ","
+    );
+  }
+
+  installNewPackageJson() {
+    try {
+      process.execSync("npm install", { stdio: "inherit" });
+      console.log("Dependencias actualizadas correctamente.");
+    } catch (error) {
+      console.error("Error al actualizar las dependencias:", error.message);
+    }
+  }
+
+  fixPackageJsonVulnerabilities() {
+    try {
+      process.execSync("npm audit fix", { stdio: "inherit" });
+      console.log("Vulnerabilidades arregladas correctamente.");
+    } catch (error) {
+      console.error("Error al arreglar las vulnerabilidades:", error.message);
+    }
+  }
+
+  getWCClassName(wcname) {
+    return wcname
+      .split("-")
+      .map((part) => {
+        return part.charAt(0).toUpperCase() + part.slice(1);
+      })
+      .join("");
+  }
+
+  generateWCStyleFile(directorioWC) {
+    const WCClassName = this.props.WCClassName;
+    console.log(`Generando ${WCClassName}Style.js...`);
+    let content = readFileSync(
+      path.join(__dirname, "templates", "src", "wc-name-style.js"),
+      "utf8"
+    );
+    let WCStylesFilename = WCClassName + "Styles.js";
+    let goodContent = content.replace(/wcName/gm, WCClassName);
+    writeFileSync(
+      path.join(directorioWC, "src", WCStylesFilename),
+      goodContent
+    );
+  }
+
+  updateWCStyleFile(directorioWC) {
+    const WCFilename = this.props.WCClassName + ".js";
+    const WCStylesFilename = this.props.WCClassName + "Styles.js";
+
+    let WCFileContent = readFileSync(
+      path.join(directorioWC, "src", WCFilename),
+      "utf8"
+    );
+    const pattern = /static styles = css`[^`]*`;/g;
+    WCFileContent = WCFileContent.replace(
+      pattern,
+      "static styles = [" + this.props.WCClassName + "Styles];"
+    );
+    WCFileContent = WCFileContent.replace(
+      "import { html, css, LitElement } from 'lit';",
+      "import { html, LitElement } from 'lit';\nimport { " +
+        this.props.WCClassName +
+        "Styles } from './" +
+        WCStylesFilename +
+        "';"
+    );
+    writeFileSync(path.join(directorioWC, "src", WCFilename), WCFileContent);
+  }
+
+  updateLicenseFile(directorioWC) {
+    const licenseContent = readFileSync(
+      path.join(
+        __dirname,
+        "templates",
+        "LICENSE_" + this.props.license.toUpperCase() + ".md"
+      ),
+      "utf8"
+    );
+    writeFileSync(path.join(directorioWC, "LICENSE"), licenseContent);
+  }
+
+  replacePackageVersion(jsonString, jsonPackage, deps) {
+    let jsonStringNew = jsonString;
+    const depsName = Object.keys(jsonPackage[deps]);
+    console.log(jsonPackage[deps]);
+    depsName.forEach((depName) => {
+      console.log("check version for " + depName);
+      const npmCommand = `npm view ${depName} version`;
+      const packageVersion = process
+        .execSync(npmCommand)
+        .toString()
+        .replace(/\n/, "");
+      const searched =
+        '"' + depName + '": "' + jsonPackage[deps][depName] + '"';
+      const replacedby = '"' + depName + '": "^' + packageVersion + '"';
+      console.log("searched: " + searched);
+      console.log("replacedby: " + replacedby);
+      jsonStringNew = jsonStringNew.replace(searched, replacedby);
+    });
+    return jsonStringNew;
+  }
+
+  updateDependenciesVersions() {
+    const jsonPackageParsed = JSON.parse(this.packageJsonContent);
+    let jsonStringNew = this.replacePackageVersion(
+      this.packageJsonContent,
+      jsonPackageParsed,
+      "dependencies"
+    );
+    jsonStringNew = this.replacePackageVersion(
+      this.packageJsonContent,
+      jsonPackageParsed,
+      "devDependencies"
+    );
+
+    return jsonStringNew;
+  }
+
+  /** * MAIN METHODS */
   prompting() {
     this.log(
-      yosay(
-        `Welcome to the ${chalk.red("lit-element-base")} generator (v1.3.8)!`
-      )
+      yosay(`Welcome to the ${chalk.red("Lit-base")} generator (v1.3.8)!`)
     );
 
     const prompts = [
-      {
-        type: "input",
-        name: "wcname",
-        message: "Lit-Element webcomponent name (in kebab-case)",
-        default: wcn,
-        validate: (input) => {
-          return Boolean(input.match(/-/));
-        },
-      },
       {
         type: "input",
         name: "author",
@@ -45,7 +214,7 @@ export default class extends Generator {
       {
         type: "confirm",
         name: "start",
-        message: "Would you like to create a lit-element webcomponent?",
+        message: "Would you like to create a Lit webcomponent?",
         default: false,
       },
     ];
@@ -53,186 +222,73 @@ export default class extends Generator {
     return this.prompt(prompts).then((props) => {
       // To access props later use this.props.someAnswer;
       this.props = props;
+
       if (this.props.start) {
-        this.props.year = new Date().getFullYear();
-        this.props.wcname = this.props.wcname.toLowerCase();
-        const { readFileSync, writeFileSync, mkdirSync } = require("fs");
-        const { join } = require("path");
-        try {
-          const {} = require("child_process");
-          execSync("rm -rf " + path.join(__dirname, "output"));
-        } catch (e) {
-          process.exit(e.code);
-        }
+        /* Instalar el paquete npm init @open-wc para crear el web-component base */
+        console.log("1.- Install WC");
+        this.installWC();
 
-        mkdirSync(join(__dirname, "output"));
-        mkdirSync(join(__dirname, "output", "demo"));
-        mkdirSync(join(__dirname, "output", "demo", "css"));
-        mkdirSync(join(__dirname, "output", "src"));
-        mkdirSync(join(__dirname, "output", "test"));
+        /* Leer el directorio actual el directorio creado mas recientemente y entrar en él */
+        console.log("2.- Move to WC directory");
+        this.putIntoWCDirectory();
 
-        const filenames = [
-          "wc-name.js",
-          "index.html",
-          "demo/index.html",
-          join("demo", "css", "styles.css"),
-          "src/WcName.js",
-          "src/wc-name-style.js",
-          "test/wc-name.test.js",
-          "package.json",
-          "rollup.config.js",
-          "postcss.config.js",
-          "LICENSE",
-          "README.md",
-        ];
-        const propCamelCase = this.props.wcname
-          .split("-")
-          .map((part) => {
-            return part.charAt(0).toUpperCase() + part.slice(1);
-          })
-          .join("");
-        filenames.forEach((filename) => {
-          let content = readFileSync(
-            join(__dirname, "templates", filename),
-            "utf8"
-          );
-          let goodContent = content.replace(/wc-name/gm, this.props.wcname);
-          goodContent = goodContent.replace(/WcName/gm, propCamelCase);
-          if (filename === "wc-name.js") {
-            filename = this.props.wcname + ".js";
-          }
+        /* Leer el fichero package.json */
+        console.log("3.- Read package.json");
+        this.packageJsonContent = readFileSync("package.json", "utf8");
 
-          if (filename === "src/WcName.js") {
-            filename = "src/" + propCamelCase + ".js";
-          }
+        /* Leer el fichero package.json y extraer el nombre del webcomponent de la propiedad name */
+        console.log("4.- Get WC name from package.json");
+        this.props.wcname = this.getWCName(this);
 
-          if (filename === "src/wc-name-style.js") {
-            filename = "src/" + this.props.wcname + "-style.js";
-          }
+        /* Actualizar datos de package.json */
+        console.log("5.- Update package.json information");
+        this.updatePackageJsonInfo();
 
-          if (filename === "test/wc-name.test.js") {
-            filename = "test/" + this.props.wcname + ".test.js";
-          }
+        /* Actualizar las versiones de las dependencias */
+        console.log("6.- Update dependencies versions");
+        this.updateDependenciesVersions();
 
-          goodContent = goodContent.replace(/WcName/gm, propCamelCase);
-          goodContent = goodContent.replace(/user/gm, this.props.author);
-          goodContent = goodContent.replace(/U_S_E_R/gm, "user");
-          writeFileSync(join(__dirname, "output", filename), goodContent);
+        /* Añadir las referencias a home, repositorio y bugs */
+        console.log("7.- Update more info of package.json");
+        this.updateMoreInfoPackageJson();
 
-          /** FILE package.json */
-          let packageContent = readFileSync(
-            join(__dirname, "templates", "package.json"),
-            "utf8"
-          );
-          let goodContent2 = packageContent.replace(
-            /user/gm,
-            this.props.author
-          );
-          goodContent2 = goodContent2.replace(/wc-name/gm, this.props.wcname);
-          goodContent2 = goodContent2.replace(/LICENSE/gm, this.props.license);
-          goodContent2 = goodContent2.replace(/YEAR/gm, this.props.year);
-          writeFileSync(
-            join(__dirname, "output", "package.json"),
-            goodContent2
-          );
+        /* Escribir el neuvo fichero package.json */
+        console.log("8.- Write new package.json");
+        writeFileSync("package.json", this.packageJsonContent, "utf8");
 
-          /** FILE README.md */
-          let readmeContent = readFileSync(
-            join(__dirname, "templates", "README.md"),
-            "utf8"
-          );
-          let goodContent3 = readmeContent.replace(
-            /wc-name/gm,
-            this.props.wcname
-          );
-          goodContent3 = goodContent.replace(/user/gm, this.props.author);
-          writeFileSync(join(__dirname, "output", "README.md"), goodContent3);
-        });
+        /* Arreglar posibles vulnerabilidades del package.json */
+        console.log("9.- Fix package.json vulnerabilities");
+        this.fixPackageJsonVulnerabilities();
+
+        /* Instalar las dependencias */
+        console.log("10.- Install new package.json");
+        this.installNewPackageJson();
+
+        /* Generar nombre del webcomponent en camelCase */
+        console.log("11.- Get WCClassName");
+        this.props.WCClassName = this.getWCClassName(this.props.wcname);
+
+        /* Obtener directorio de trabajo del script */
+        console.log("12.- Get working directory");
+        const directorioWC = nodeprocess.cwd();
+
+        /* Generar fichero src/wc-name-style.js */
+        console.log("13.- Generate WCStyleFile from template");
+        this.generateWCStyleFile(directorioWC);
+
+        /* Insertar el fichero src/wc-name-style.js en el fichero src/wc-name.js */
+        console.log("14.- Update WCStyleFile");
+        this.updateWCStyleFile(directorioWC);
+
+        /* Modificar el fichero LICENSE con la licencia seleccionada */
+        console.log("15.- Update LICENSE file");
+        this.updateLicenseFile(directorioWC);
+      } else {
+        this.log(
+          "\n\n* * *   STOPED Generator Lit Element Base by User   * * *\n"
+        );
+        nodeprocess.exit(0);
       }
     });
-  }
-
-  writing() {
-    const propCamelCase = this.props.wcname
-      .split("-")
-      .map((part) => {
-        return part.charAt(0).toUpperCase() + part.slice(1);
-      })
-      .join("");
-    if (this.props.start) {
-      const { join } = require("path");
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", this.props.wcname + ".js")),
-        this.destinationPath(this.props.wcname + ".js")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "package.json")),
-        this.destinationPath("package.json")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "index.html")),
-        this.destinationPath("index.html")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "demo/css/styles.css")),
-        this.destinationPath("demo/css/styles.css")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "demo/index.html")),
-        this.destinationPath("demo/index.html")
-      );
-      this.fs.copy(
-        this.templatePath(
-          join(__dirname, "output", "src", this.props.wcname + "-style.js")
-        ),
-        this.destinationPath("src/" + this.props.wcname + "-style.js")
-      );
-      this.fs.copy(
-        this.templatePath(
-          join(__dirname, "output", "src", propCamelCase + ".js")
-        ),
-        this.destinationPath("src/" + propCamelCase + ".js")
-      );
-      this.fs.copy(
-        this.templatePath(
-          join(__dirname, "output", "test", this.props.wcname + ".test.js")
-        ),
-        this.destinationPath("test/" + this.props.wcname + ".test.js")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "rollup.config.js")),
-        this.destinationPath("rollup.config.js")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "postcss.config.js")),
-        this.destinationPath("postcss.config.js")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "LICENSE")),
-        this.destinationPath("LICENSE")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "output", "README.md")),
-        this.destinationPath("README.md")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "templates", "babel.config.js")),
-        this.destinationPath("babel.config.js")
-      );
-      this.fs.copy(
-        this.templatePath(join(__dirname, "templates", "gitignorefile")),
-        this.destinationPath(".gitignore")
-      );
-    } else {
-      this.log(
-        "\n\n* * *   STOPED Generator Lit Element Base by User   * * *\n"
-      );
-    }
-  }
-
-  install() {
-    if (this.props.start) {
-      this.npmInstall();
-    }
   }
 }

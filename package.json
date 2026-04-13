@@ -1,7 +1,7 @@
 {
-  "name": "generator-lit-element-base",
+  "name": "generator-lit-base",
   "version": "1.5.5",
-  "description": "Generator to create a improvment LitElement WebComponent from @open-wc",
+  "description": "Generator to create a improvment Lit WebComponent from @open-wc",
   "homepage": "https://github.com/manufosela/generator-litelement-webcomponent",
   "author": {
     "name": "manufosela",
@@ -14,7 +14,7 @@
   ],
   "main": "generators/app/index.js",
   "keywords": [
-    "lit-element",
+    "lit",
     "webcomponents",
     "scafolding",
     "yeoman-generator"
